@@ -43,13 +43,13 @@ debug(const char *fmt, ...){
    va_end(ap);
 }
 
-char 
+char
 *uuid_v1(void) {
     uuid_t *uuid;
     char *str;
 
     uuid_create(&uuid);
-    uuid_make(uuid, UUID_MAKE_V1);
+    uuid_make(uuid, UUID_MAKE_V4);
     str = NULL;
     uuid_export(uuid, UUID_FMT_STR, &str, NULL);
     uuid_destroy(uuid);
@@ -69,14 +69,14 @@ vmod_uuid(struct sess *sp, struct vmod_priv *pv){
 
    char *uuid_str = uuid_v1();
 
-   u = WS_Reserve(sp->wrk->ws, 0);     // Reserve some work space 
+   u = WS_Reserve(sp->wrk->ws, 0);     // Reserve some work space
    if (sizeof(uuid_str) > u) {
-      // No space, reset and leave 
+      // No space, reset and leave
       WS_Release(sp->wrk->ws, 0);
       return(NULL);
    }
 
-   p = sp->wrk->ws->f;                 // Front of workspace area 
+   p = sp->wrk->ws->f;                 // Front of workspace area
 
    strncpy(p, uuid_str, 37);
    // free up the uuid string once it's copied in place
@@ -87,7 +87,7 @@ vmod_uuid(struct sess *sp, struct vmod_priv *pv){
    // keep track of how much we actually used
    v+=37;
 
-   // Update work space with what we've used 
+   // Update work space with what we've used
    WS_Release(sp->wrk->ws, v);
 //   debug("uuid: %s", p);
    return(p);
